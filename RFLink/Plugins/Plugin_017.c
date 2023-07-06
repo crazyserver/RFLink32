@@ -1,7 +1,7 @@
 #define RTS_PLUGIN_ID 017
 #define PLUGIN_DESC_017 "RTS remote controlled devices"
-//#define SerialDebugActivated
-//#define PLUGIN_017_DEBUG
+#define SerialDebugActivated
+#define PLUGIN_017_DEBUG
 
 #ifdef PLUGIN_017
 #include "../4_Display.h"
@@ -14,7 +14,7 @@
 #include <LittleFS.h>
 #endif
 
-// Inspired by 
+// Inspired by
 // https://github.com/etimou/SomfyRTS/blob/master/SomfyRTS.cpp
 // https://github.com/arendst/Tasmota/issues/3108
 // https://github.com/Nickduino/Somfy_Remote
@@ -51,7 +51,7 @@ boolean Plugin_017(byte function, const char *string)
 
    // ;Pulses=82;Pulses(uSec)=2449,2542,4787,1299,1264,674,612,1311,1263,1301,1261,666,608,1315,1255,683,610,663,615,679,611,1299,1263,1307,611,679,1263,663,611,1309,610,666,1255,1315,1255,682,606,1316,611,665,605,678,1248,679,611,1310,1259,1300,611,679,1259,1311,1259,1311,1263,675,603,679,611,1311,1259,667,611,1311,1259,1311,611,667,611,679,611,667,612,678,1247,1315,608,678,600,678,1260,0
 
-   if (RawSignal.Number >= RTS_MinPulses && RawSignal.Number <= RTS_MaxPulses) 
+   if (RawSignal.Number >= RTS_MinPulses && RawSignal.Number <= RTS_MaxPulses)
    {
         const int RTS_HardwareSyncPulseDuration = 2000 / RawSignal.Multiply;
         const int RTS_LongPulseMinDuration = 1000 / RawSignal.Multiply;
@@ -89,7 +89,7 @@ boolean Plugin_017(byte function, const char *string)
             return false;
         }
 
-        if (pulseIndex % 2 != 1) 
+        if (pulseIndex % 2 != 1)
         {
             #ifdef PLUGIN_017_DEBUG
             Serial.print(F(PLUGIN_017_ID ": HwSync/SoftSync pulse pair found, but SoftSync not on an ON Pulse; index = "));
@@ -246,11 +246,11 @@ boolean Plugin_017(byte function, const char *string)
 
         // verify checksum
         uint8_t cksum = 0;
-        for (int i = 0; i < 7; ++i) 
+        for (int i = 0; i < 7; ++i)
             cksum ^= frame[i] ^ (frame[i] >> 4);
         cksum &= 0x0F;
 
-        if (cksum != 0) 
+        if (cksum != 0)
         {
             #ifdef PLUGIN_017_DEBUG
             Serial.print(F(PLUGIN_017_ID ": Invalid Checksum : "));
@@ -290,8 +290,8 @@ boolean Plugin_017(byte function, const char *string)
          // all is good, output the received packet
         display_Header();
         display_Name(PLUGIN_017_ID);
-        display_IDn(remoteAddress, 6);  
-        display_IDn(rollingCode, 4);  
+        display_IDn(remoteAddress, 6);
+        display_IDn(rollingCode, 4);
         display_CMD(false, command);
         display_Footer();
         RawSignal.Repeats = true; // suppress repeats of the same RF packet
@@ -318,10 +318,10 @@ boolean PluginTX_017(byte function, const char *string)
     //10;RTSRECCLEAN=9 => Clean Rolling code record number (value from 0 - 31)
     //10;RTSSHOW; => Show Rolling code table stored in internal EEPROM (includes RTS settings)
     //10;RTSINVERT; => Toggle RTS ON/OFF inversion
-    //10;RTSLONGTX; => Toggle RTS long transmit ON/OFF 
+    //10;RTSLONGTX; => Toggle RTS long transmit ON/OFF
     //10;RTS;1a602a;0;UP; => RTS protocol, address, unused, command
     //10;RTS;1b602b;0123;PAIR; => Pairing for RTS rolling code: RTS protocol, address, rolling code number (hex), PAIR command (eeprom record number is set to 0)
-    //10;RTS;1b602b;0123;0;PAIR; => Extended Pairing for RTS rolling code: RTS protocol, address, rolling code number (hex), eeprom record number (hex), PAIR command    
+    //10;RTS;1b602b;0123;0;PAIR; => Extended Pairing for RTS rolling code: RTS protocol, address, rolling code number (hex), eeprom record number (hex), PAIR command
 
     // create default file if it does not exist
     if (!LittleFS.exists(RTS_ConfigFileName))
@@ -337,7 +337,7 @@ boolean PluginTX_017(byte function, const char *string)
 
     if (!retrieve_Name("10"))
         return false;
-    
+
     if (retrieve_Name("RTSCLEAN"))
     {
         LittleFS.remove(RTS_ConfigFileName);
@@ -365,10 +365,10 @@ boolean PluginTX_017(byte function, const char *string)
             {
                 #ifdef PLUGIN_017_DEBUG
                 Serial.println(F(PLUGIN_017_ID ": Storage file too short for address!"));
-                #endif 
+                #endif
                 return false;
             }
-            
+
             uint16_t codeInFile;
             if (file.read((uint8_t*)&codeInFile, RTS_RollingCodeSize) != RTS_RollingCodeSize)
             {
@@ -428,10 +428,10 @@ boolean PluginTX_017(byte function, const char *string)
             {
                 #ifdef PLUGIN_017_DEBUG
                 Serial.println(F(PLUGIN_017_ID ": Storage file too short for address!"));
-                #endif 
+                #endif
                 return false;
             }
-            
+
             if (file.read((uint8_t*)&code, sizeof(code)) != sizeof(code))
             {
                 #ifdef PLUGIN_017_DEBUG
@@ -458,7 +458,7 @@ boolean PluginTX_017(byte function, const char *string)
     }
 
     // map command to button value
-    /*   
+    /*
       RFLink        Byte       RTS         Description
     VALUE_STOP      0x1     My          Stop or move to favourite position
     VALUE_UP        0x2     Up          Move up
@@ -514,7 +514,7 @@ boolean PluginTX_017(byte function, const char *string)
 
     // create checksum and place it in low nibble of frame[1]
     uint8_t checksum = 0;
-    for(uint8_t i = 0; i < RTS_ExpectedByteCount; i++) 
+    for(uint8_t i = 0; i < RTS_ExpectedByteCount; i++)
         checksum ^= frame[i] ^ (frame[i] >> 4);
     checksum &= 0x0F;
     frame[1] |= checksum;
@@ -530,7 +530,7 @@ boolean PluginTX_017(byte function, const char *string)
     #endif
 
     // obfuscate
-    for(uint8_t i = 1; i < RTS_ExpectedByteCount; i++) 
+    for(uint8_t i = 1; i < RTS_ExpectedByteCount; i++)
         frame[i] ^= frame[i-1];
 
     // send first occurence
@@ -540,7 +540,7 @@ boolean PluginTX_017(byte function, const char *string)
     for (uint8_t i = 0; i < 2; i++)
         sendFrame(frame, false);
 
-    // store next code 
+    // store next code
     saveRTSRecord(eepromRecordNumber, address, ++code);
 
     return true;
@@ -569,8 +569,8 @@ void sendFrame(uint8_t* frame, bool isFirst)
     DeclareRTS_SoftwareSyncPulseDuration;
 
     // wake up pulse, only for first frame
-    if (isFirst) 
-    { 
+    if (isFirst)
+    {
         digitalWrite(Radio::pins::TX_DATA, HIGH);
         delayMicroseconds(RTS_WakeUpPulseDuration);
         digitalWrite(Radio::pins::TX_DATA, LOW);
@@ -592,16 +592,16 @@ void sendFrame(uint8_t* frame, bool isFirst)
     delayMicroseconds(RTS_HalfBitPulseDuration);
 
     // Data: bits are sent one by one, starting with the MSB.
-    for(byte i = 0; i < RTS_ExpectedBitCount; i++) 
+    for(byte i = 0; i < RTS_ExpectedBitCount; i++)
     {
-        if(((frame[i/8] >> (7 - (i%8))) & 1) == 1) 
+        if(((frame[i/8] >> (7 - (i%8))) & 1) == 1)
         {
             digitalWrite(Radio::pins::TX_DATA, LOW);
             delayMicroseconds(RTS_HalfBitPulseDuration);
             digitalWrite(Radio::pins::TX_DATA, HIGH);
             delayMicroseconds(RTS_HalfBitPulseDuration);
         }
-        else 
+        else
         {
             digitalWrite(Radio::pins::TX_DATA, HIGH);
             delayMicroseconds(RTS_HalfBitPulseDuration);
@@ -620,4 +620,3 @@ void sendFrame(uint8_t* frame, bool isFirst)
 }
 
 #endif //PLUGIN_TX_017
-
