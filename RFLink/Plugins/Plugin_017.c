@@ -606,6 +606,14 @@ boolean PluginTX_017(byte function, const char *string)
     Serial.println();
     #endif
 
+    #ifndef RFLINK_MQTT_DISABLED
+    display_Header();
+    display_Name(PSTR("SEND"));
+    display_SIGNAL(frame, RTS_ExpectedByteCount);
+    display_Footer();
+    RFLink::sendMsgFromBuffer();
+    #endif // !RFLINK_MQTT_DISABLED
+
     // obfuscate
     for(uint8_t i = 1; i < RTS_ExpectedByteCount; i++) 
         frame[i] ^= frame[i-1];
