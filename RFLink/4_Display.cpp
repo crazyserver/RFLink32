@@ -71,6 +71,27 @@ void display_IDn(unsigned long input, byte n)
   strcat(pbuffer, dbuffer);
 }
 
+// ID=9999 => device ID (often a rolling code) (Hexadecimal)
+void display_CODE(unsigned long input, byte n)
+{
+  switch (n)
+  {
+  case 2:
+    sprintf_P(dbuffer, PSTR("%s%02lx"), PSTR(";CODE="), input);
+    break;
+  case 4:
+    sprintf_P(dbuffer, PSTR("%s%04lx"), PSTR(";CODE="), input);
+    break;
+  case 6:
+    sprintf_P(dbuffer, PSTR("%s%06lx"), PSTR(";CODE="), input);
+    break;
+  case 8:
+  default:
+    sprintf_P(dbuffer, PSTR("%s%08lx"), PSTR(";CODE="), input);
+  }
+  strcat(pbuffer, dbuffer);
+}
+
 void display_IDc(const char *input)
 {
   sprintf_P(dbuffer, PSTR("%s"), PSTR(";ID="));
@@ -133,9 +154,23 @@ void display_CMD(boolean all, byte on)
     break;
   case CMD_Unknown:
   default:
-    sprintf_P(dbuffer, PSTR("%s"), PSTR("UNKNOWN"));
+    sprintf_P(dbuffer, PSTR("%s (%d)"), PSTR("UNKNOWN"), on);
   }
   strcat(pbuffer, dbuffer);
+}
+
+void display_SIGNAL(uint8_t* frame, int RTS_ExpectedByteCount)
+{
+  sprintf_P(tempJsonbuffer, PSTR("signal: '"));
+  strcat(jsonBuffer, tempJsonbuffer);
+
+  for (int i = 0; i < RTS_ExpectedByteCount; i++)
+  {
+    sprintf_P(tempJsonbuffer, PSTR("%02d "), frame[i]);
+    strcat(jsonBuffer, tempJsonbuffer);
+  }
+  sprintf_P(tempJsonbuffer, PSTR("',"));
+  strcat(jsonBuffer, tempJsonbuffer);
 }
 
 // SET_LEVEL=15 => Direct dimming level setting value (decimal value: 0-15)
@@ -466,7 +501,7 @@ boolean retrieve_Command(byte &value, const char* prefix)
 
     return (value != false);
   }
-  
+
   return false;
 }
 
@@ -506,7 +541,7 @@ boolean retrieve_ID(unsigned long &ul_ID)
 {
     boolean result = retrieve_long(ul_ID, "ID=");
     if (result)
-        ul_ID &= 0x03FFFFFF; 
+        ul_ID &= 0x03FFFFFF;
     return result;
 }
 

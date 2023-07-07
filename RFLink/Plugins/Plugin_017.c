@@ -291,8 +291,9 @@ boolean Plugin_017(byte function, const char *string)
         display_Header();
         display_Name(PLUGIN_017_ID);
         display_IDn(remoteAddress, 6);
-        display_IDn(rollingCode, 4);
+        display_CODE(rollingCode, 4);
         display_CMD(false, command);
+        display_SIGNAL(frame, RTS_ExpectedByteCount);
         display_Footer();
         RawSignal.Repeats = true; // suppress repeats of the same RF packet
         return true;
