@@ -14,6 +14,8 @@
 
 // extern byte PKSequenceNumber;     // 1 byte packet counter
 extern char pbuffer[PRINT_BUFFER_SIZE]; // Buffer for printing data
+extern char topicName[PRINT_BUFFER_SIZE]; // Topic name for MQTT
+extern char jsonBuffer[PRINT_BUFFER_SIZE]; // Buffer for MQTT
 
 void display_Header(void);
 void display_Name(const char *);

@@ -12,8 +12,10 @@
 
 byte PKSequenceNumber = 0;       // 1 byte packet counter
 char dbuffer[60];                // Buffer for message chunk data
+char tempJsonbuffer[60];         // Buffer for message chunk data
 char pbuffer[PRINT_BUFFER_SIZE]; // Buffer for complete message data
-
+char topicName[PRINT_BUFFER_SIZE]; // Topic name for MQTT
+char jsonBuffer[PRINT_BUFFER_SIZE]; // Buffer for MQTT
 // ------------------- //
 // Display shared func //
 // ------------------- //
@@ -27,6 +29,7 @@ void display_Header(void)
 {
   sprintf_P(dbuffer, PSTR("%s%02X"), PSTR("20;"), PKSequenceNumber++);
   strcat(pbuffer, dbuffer);
+  sprintf_P(jsonBuffer, PSTR("%s"), PSTR("{"));
 }
 
 // Plugin Name
@@ -34,6 +37,7 @@ void display_Name(const char *input)
 {
   sprintf_P(dbuffer, PSTR(";%s"), input);
   strcat(pbuffer, dbuffer);
+  sprintf_P(topicName, PSTR("%s"), input);
 }
 
 // Common Footer
@@ -41,6 +45,10 @@ void display_Footer(void)
 {
   sprintf_P(dbuffer, PSTR("%s"), PSTR(";\r\n"));
   strcat(pbuffer, dbuffer);
+
+  sprintf_P(tempJsonbuffer, PSTR("%s"), PSTR("}"));
+  strcat(jsonBuffer, tempJsonbuffer);
+
 }
 
 // Start message
@@ -57,18 +65,24 @@ void display_IDn(unsigned long input, byte n)
   {
   case 2:
     sprintf_P(dbuffer, PSTR("%s%02lx"), PSTR(";ID="), input);
+    sprintf_P(tempJsonbuffer, PSTR("%s%02lx"), PSTR("/"), input);
     break;
   case 4:
     sprintf_P(dbuffer, PSTR("%s%04lx"), PSTR(";ID="), input);
+    sprintf_P(tempJsonbuffer, PSTR("%s%04lx"), PSTR("/"), input);
     break;
   case 6:
     sprintf_P(dbuffer, PSTR("%s%06lx"), PSTR(";ID="), input);
+    sprintf_P(tempJsonbuffer, PSTR("%s%06lx"), PSTR("/"), input);
     break;
   case 8:
   default:
     sprintf_P(dbuffer, PSTR("%s%08lx"), PSTR(";ID="), input);
+    sprintf_P(tempJsonbuffer, PSTR("%s%08lx"), PSTR("/"), input);
   }
   strcat(pbuffer, dbuffer);
+  strcat(topicName, tempJsonbuffer);
+
 }
 
 // ID=9999 => device ID (often a rolling code) (Hexadecimal)
@@ -78,18 +92,24 @@ void display_CODE(unsigned long input, byte n)
   {
   case 2:
     sprintf_P(dbuffer, PSTR("%s%02lx"), PSTR(";CODE="), input);
+    sprintf_P(tempJsonbuffer, PSTR("code: '%02lx',"), input);
     break;
   case 4:
     sprintf_P(dbuffer, PSTR("%s%04lx"), PSTR(";CODE="), input);
+    sprintf_P(tempJsonbuffer, PSTR("code: '%04lx',"), input);
     break;
   case 6:
     sprintf_P(dbuffer, PSTR("%s%06lx"), PSTR(";CODE="), input);
+    sprintf_P(tempJsonbuffer, PSTR("code: '%06lx',"), input);
     break;
   case 8:
   default:
     sprintf_P(dbuffer, PSTR("%s%08lx"), PSTR(";CODE="), input);
+    sprintf_P(tempJsonbuffer, PSTR("code: '%08lx',"), input);
   }
   strcat(pbuffer, dbuffer);
+
+  strcat(jsonBuffer, tempJsonbuffer);
 }
 
 void display_IDc(const char *input)
@@ -130,33 +150,43 @@ void display_CMD(boolean all, byte on)
   {
   case CMD_On:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("ON"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("ON"));
     break;
   case CMD_Off:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("OFF"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("OFF"));
     break;
   case CMD_Bright:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("BRIGHT"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("BRIGHT"));
     break;
   case CMD_Dim:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("DIM"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("DIM"));
     break;
   case CMD_Up:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("UP"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("UP"));
     break;
   case CMD_Down:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("DOWN"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("DOWN"));
     break;
   case CMD_Stop:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("STOP"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("STOP"));
     break;
   case CMD_Pair:
     sprintf_P(dbuffer, PSTR("%s"), PSTR("PAIR"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("PAIR"));
     break;
   case CMD_Unknown:
   default:
-    sprintf_P(dbuffer, PSTR("%s (%d)"), PSTR("UNKNOWN"), on);
+    sprintf_P(dbuffer, PSTR("%s"), PSTR("UNKNOWN"));
+    sprintf_P(tempJsonbuffer, PSTR("cmd: '%s',"), PSTR("UNKNOWN"));
   }
   strcat(pbuffer, dbuffer);
+  strcat(jsonBuffer, tempJsonbuffer);
 }
 
 void display_SIGNAL(uint8_t* frame, int RTS_ExpectedByteCount)
@@ -166,10 +196,10 @@ void display_SIGNAL(uint8_t* frame, int RTS_ExpectedByteCount)
 
   for (int i = 0; i < RTS_ExpectedByteCount; i++)
   {
-    sprintf_P(tempJsonbuffer, PSTR("%02d "), frame[i]);
+    sprintf_P(tempJsonbuffer, PSTR("%02x "), frame[i]);
     strcat(jsonBuffer, tempJsonbuffer);
   }
-  sprintf_P(tempJsonbuffer, PSTR("',"));
+  sprintf_P(tempJsonbuffer, PSTR("'"));
   strcat(jsonBuffer, tempJsonbuffer);
 }
 
