@@ -20,6 +20,8 @@ void display_Name(const char *);
 void display_Footer(void);
 void display_Splash(void);
 void display_IDn(unsigned long, byte);
+void display_CODE(unsigned long, byte);
+void display_SIGNAL(uint8_t* frame, int RTS_ExpectedByteCount);
 void display_IDc(const char *);
 void display_SWITCH(byte);
 void display_SWITCHc(const char *);
