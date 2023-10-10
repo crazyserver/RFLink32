@@ -1,7 +1,7 @@
 #define RTS_PLUGIN_ID 017
 #define PLUGIN_DESC_017 "RTS remote controlled devices"
-//#define SerialDebugActivated
-//#define PLUGIN_017_DEBUG
+#define SerialDebugActivated
+#define PLUGIN_017_DEBUG
 
 #ifdef PLUGIN_017
 #include "../4_Display.h"
