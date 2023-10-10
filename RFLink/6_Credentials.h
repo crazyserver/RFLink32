@@ -11,16 +11,16 @@
 #include "RFLink.h"
 
 // MQTT Server
-#define  MQTT_SERVER "192.168.1.xxx"
+#define  MQTT_SERVER "192.168.0.55"
 #define  MQTT_PORT 1883
 #define  MQTT_ID "RFLink32"
-#define  MQTT_USER "xxx"
+#define  MQTT_USER "addons"
 #define  MQTT_PSWD "xxx"
 
 // MQTT Topic
-#define MQTT_TOPIC_OUT "/ESP00/msg"
-#define MQTT_TOPIC_IN "/ESP00/cmd"
-#define MQTT_TOPIC_LWT "/ESP00/lwt"
+#define MQTT_TOPIC_OUT "rflink/msg"
+#define MQTT_TOPIC_IN "rflink/cmd"
+#define MQTT_TOPIC_LWT "rflink/lwt"
 
 // OTA
 #define AutoOTA_URL "http://domain.com/firmware.bin"
