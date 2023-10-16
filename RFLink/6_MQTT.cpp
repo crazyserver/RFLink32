@@ -101,7 +101,7 @@ const char *mqtt_ca_cert_filename = "/mqtt_ca_cert.pem";
 char tempJsonbuffer[60];         // Buffer for message chunk data
 
 struct timeval lastMqttConnectionAttemptTime;
-bool paramsHaveChanged = true; 
+bool paramsHaveChanged = true;
 
 Config::ConfigItem configItems[] =  {
   Config::ConfigItem(json_name_enabled, Config::SectionId::MQTT_id, RFLink_default_MQTT_ENABLED, paramsUpdatedCallback),
@@ -217,7 +217,7 @@ void refreshParametersFromConfig(bool triggerChanges) {
     // Applying changes will happen in mainLoop()
     if(triggerChanges && changesDetected) {
       Serial.println(F("Mqtt parameters have changed, they will be applied at next 'loop'."));
-      paramsHaveChanged = true; 
+      paramsHaveChanged = true;
     }
 
 }
@@ -339,6 +339,8 @@ void publishMsg()
 
 void publishMsgJson()
 {
+  serializeJsonPretty(jsonDoc, jsonBuffer);
+
   sprintf_P(tempJsonbuffer, PSTR("%s/%s"), params::topic_out.c_str(), topicName);
   MQTTClient.publish(tempJsonbuffer, jsonBuffer, MQTT_RETAINED_0);
 }
@@ -487,6 +489,3 @@ void triggerParamsHaveChanged() {
 
 #endif // RFLINK_WIFI_ENABLED
 #endif // not RFLINK_MQTT_DISABLED
-
-
-

@@ -9,13 +9,17 @@
 #define Misc_h
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 #define PRINT_BUFFER_SIZE 120 // 90         // Maximum number of characters that a command should print in one go via the print buffer.
+#define JSON_BUFFER_SIZE 1024               // Maximum number of characters that a command should print in one go via the json buffer.
+
 
 // extern byte PKSequenceNumber;     // 1 byte packet counter
 extern char pbuffer[PRINT_BUFFER_SIZE]; // Buffer for printing data
 extern char topicName[PRINT_BUFFER_SIZE]; // Topic name for MQTT
-extern char jsonBuffer[PRINT_BUFFER_SIZE]; // Buffer for MQTT
+extern char jsonBuffer[JSON_BUFFER_SIZE]; // Buffer for MQTT
+extern StaticJsonDocument<JSON_BUFFER_SIZE> jsonDoc;
 
 void display_Header(void);
 void display_Name(const char *);
@@ -28,6 +32,7 @@ void display_IDc(const char *);
 void display_SWITCH(byte);
 void display_SWITCHc(const char *);
 void display_CHAN(byte);
+void addToBuffer(const char *, const char *, ... );
 enum CMD_Group
 {
     CMD_Single,
@@ -86,8 +91,7 @@ void display_METER(unsigned int);
 void display_VOLT(unsigned int);
 void display_RGBW(unsigned int);
 
-void addToBuffer(const char * format, const char * fieldName, ... );
-
+void addToBuffer(const char* format, const char* fieldName, const void* value );
 
 // These functions are here to help writing the emitting part of a plugin by interpreting the received command
 // A local copy of the original InputBuffer_Serial is split by semi colons into tokens seperated when calling

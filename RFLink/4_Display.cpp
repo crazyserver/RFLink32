@@ -15,7 +15,9 @@ char dbuffer[60];                // Buffer for message chunk data
 char tempJsonbuffer[60];         // Buffer for message chunk data
 char pbuffer[PRINT_BUFFER_SIZE]; // Buffer for complete message data
 char topicName[PRINT_BUFFER_SIZE]; // Topic name for MQTT
-char jsonBuffer[PRINT_BUFFER_SIZE]; // Buffer for MQTT
+char jsonBuffer[JSON_BUFFER_SIZE]; // Buffer for MQTT
+StaticJsonDocument<JSON_BUFFER_SIZE> jsonDoc; // JSON document for MQTT
+
 // ------------------- //
 // Display shared func //
 // ------------------- //
@@ -29,7 +31,8 @@ void display_Header(void)
 {
   sprintf_P(dbuffer, PSTR("%s%02X"), PSTR("20;"), PKSequenceNumber++);
   strcat(pbuffer, dbuffer);
-  sprintf_P(jsonBuffer, PSTR("%s"), PSTR("{"));
+  // sprintf_P(jsonBuffer, PSTR("%s"), PSTR("{"));
+  jsonDoc.clear();
 }
 
 // Plugin Name
@@ -46,9 +49,8 @@ void display_Footer(void)
   sprintf_P(dbuffer, PSTR("%s"), PSTR(";\r\n"));
   strcat(pbuffer, dbuffer);
 
-  sprintf_P(tempJsonbuffer, PSTR("%s"), PSTR("}"));
-  strcat(jsonBuffer, tempJsonbuffer);
-
+  // sprintf_P(tempJsonbuffer, PSTR("%s"), PSTR("}"));
+  // strcat(jsonBuffer, tempJsonbuffer);
 }
 
 // Start message
@@ -118,7 +120,7 @@ void display_SWITCH(byte input)
 // SWITCH=A16 => House/Unit code like A1, P2, B16 or a button number etc.
 void display_SWITCHc(const char *input)
 {
-  addToBuffer()"%s", "SWITCH", input);
+  addToBuffer("%s", "SWITCH", input);
 }
 
 // CMD=ON => Command (ON/OFF/ALLON/ALLOFF) Additional for Milight: DISCO+/DISCO-/MODE0 - MODE8
@@ -350,7 +352,7 @@ void display_DIST(unsigned int input)
 }
 
 // METER=1234 => Meter values (water/electricity etc.)
-void display_METER(unsigned int input)∫
+void display_METER(unsigned int input)
 {
   addToBuffer("%04d", "METER", input);
 }
@@ -373,16 +375,21 @@ void display_CHAN(byte channel)
   addToBuffer("%04x", "CHN", channel);
 }
 
-void addToBuffer(const char * format, const char * fieldName, ... )  {
-  sprintf_P(dbuffer, PSTR(";%s=%s"), PSTR(format));
+void addToBuffer(const char* format, const char* fieldName, const void* value )  {
+  sprintf_P(dbuffer, PSTR(";%s=%s"), format);
 
-  sprintf_P(dbuffer, PSTR(dbuffer), PSTR(fieldName), args);
+  sprintf_P(dbuffer, dbuffer, fieldName, value);
   strcat(pbuffer, dbuffer);
 
-  sprintf_P(dbuffer, PSTR("'%s': %s,"), PSTR(format));
+  sprintf_P(dbuffer, PSTR("'%s': %s,"), format);
 
-  sprintf_P(dbuffer, dbuffer, PSTR(tolower(fieldName)), args);
+  //const char* lowername = tolower(fieldName);
+
+  sprintf_P(dbuffer, dbuffer, fieldName, value);
   strcat(jsonBuffer, dbuffer);
+
+  sprintf_P(dbuffer, format, value);
+  jsonDoc[fieldName] = dbuffer;
 }
 
 
